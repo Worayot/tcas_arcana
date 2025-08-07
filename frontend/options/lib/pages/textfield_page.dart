@@ -1,6 +1,6 @@
-// textfield_page.dart
 import 'package:flutter/material.dart';
-import 'package:options/widgets/textfield.dart'; // Assumes TextFieldHome is defined here
+import 'package:options/widgets/item_name_map.dart';
+import 'package:options/widgets/textfield.dart';
 
 class TextFieldPage extends StatefulWidget {
   const TextFieldPage({super.key});
@@ -10,41 +10,42 @@ class TextFieldPage extends StatefulWidget {
 }
 
 class _TextFieldPageState extends State<TextFieldPage> {
+  bool _disposed = false;
   // Map to store controllers for each selected item
   final Map<String, TextEditingController> _controllers = {};
   List<String> _selectedItems = [];
 
-  @override
-  void initState() {
-    super.initState();
+  bool _initialized = false;
 
-    // Delay access to ModalRoute until after the first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_initialized && mounted) {
       final args = ModalRoute.of(context)?.settings.arguments;
       if (args is List<String>) {
-        setState(() {
-          _selectedItems = args;
-          // Initialize controllers for each selected item
-          for (var item in _selectedItems) {
-            _controllers[item] = TextEditingController();
-          }
-        });
+        _selectedItems = args;
+        for (var item in _selectedItems) {
+          _controllers[item] = TextEditingController();
+        }
+        _initialized = true;
       } else {
-        // Optional: handle missing or invalid arguments
         debugPrint('No valid arguments passed to TextFieldPage');
       }
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.surfaceContainer,
         title: const Text("TCAS Arcana"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
+            if (!mounted) return;
             Navigator.pop(context);
           },
         ),
@@ -61,6 +62,7 @@ class _TextFieldPageState extends State<TextFieldPage> {
               ),
             ),
             onTap: () {
+              if (!mounted) return;
               // Collect the data from the text fields
               List<Map<String, String>> values = [];
               for (int idx = 0; idx < _controllers.length; idx++) {
@@ -76,31 +78,41 @@ class _TextFieldPageState extends State<TextFieldPage> {
           ),
         ],
       ),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            ..._selectedItems.map((item) {
-              final controller = _controllers[item];
-              if (controller == null)
-                return const SizedBox(); // Fallback widget
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: TextFieldHome(controller: controller, labelText: item),
-              );
-            }),
-          ],
-        ),
+        child:
+            (mounted)
+                ? ListView(
+                  children: [
+                    ..._selectedItems.map((item) {
+                      final controller = _controllers[item];
+                      if (controller == null) {
+                        return const SizedBox();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: TextFieldHome(
+                          controller: controller,
+                          labelText: itemNameMap[item],
+                        ),
+                      );
+                    }),
+                  ],
+                )
+                : SizedBox(),
       ),
     );
   }
 
   @override
   void dispose() {
-    // Dispose of all the controllers when the page is destroyed
-    _controllers.forEach((key, controller) {
-      controller.dispose();
-    });
+    if (!_disposed) {
+      _controllers.forEach((_, controller) {
+        controller.dispose();
+      });
+      _disposed = true;
+    }
     super.dispose();
   }
 }

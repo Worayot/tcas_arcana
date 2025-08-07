@@ -1,7 +1,11 @@
 // checkbox_page.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:options/widgets/item_name_map.dart';
 
 class CheckboxListPage extends StatefulWidget {
+  const CheckboxListPage({super.key});
+
   @override
   _CheckboxListPageState createState() => _CheckboxListPageState();
 }
@@ -73,23 +77,124 @@ class _CheckboxListPageState extends State<CheckboxListPage> {
     List<String> items,
     Map<String, bool> checkedItems,
   ) {
-    return ExpansionTile(
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-      collapsedBackgroundColor: Theme.of(context).colorScheme.primaryFixed,
-      children:
-          items.map((item) {
-            return CheckboxListTile(
-              title: Text(item),
-              value: checkedItems[item],
-              onChanged: (bool? value) {
-                setState(() {
-                  checkedItems[item] = value ?? false;
-                  enableNextButton = getSelectedItems().isNotEmpty;
-                });
-              },
-            );
-          }).toList(),
+    bool allSelected = items.every((item) => checkedItems[item] == true);
+
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(maxWidth: 600),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 2,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Theme(
+                      data: Theme.of(
+                        context,
+                      ).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        title: Text(
+                          title,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        backgroundColor: Color(0xffEAF6FF),
+                        collapsedBackgroundColor:
+                            Theme.of(context).colorScheme.primaryFixed,
+                        children:
+                            items.map((item) {
+                              return CheckboxListTile(
+                                title: Text(itemNameMap[item] ?? item),
+                                value: checkedItems[item],
+
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    checkedItems[item] = value ?? false;
+                                    enableNextButton =
+                                        getSelectedItems().isNotEmpty;
+                                  });
+                                },
+                              );
+                            }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Card(
+                color: Color(0xff013D5A),
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Container(
+                  width: 100,
+                  height: 50,
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color:
+                              allSelected
+                                  ? Colors.transparent
+                                  : Colors.white70.withAlpha(
+                                    220,
+                                  ), // White when unchecked
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        child: Checkbox(
+                          value: allSelected,
+                          splashRadius: 16,
+                          checkColor: Theme.of(context).colorScheme.primary,
+                          activeColor: Colors.white,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              for (var item in items) {
+                                checkedItems[item] = value ?? false;
+                              }
+                              enableNextButton = getSelectedItems().isNotEmpty;
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        "selectAll".tr(),
+                        style: TextStyle(fontSize: 10, color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -98,7 +203,9 @@ class _CheckboxListPageState extends State<CheckboxListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("TCAS Arcana"),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+
         actions: [
           if (enableNextButton)
             InkWell(
@@ -125,9 +232,18 @@ class _CheckboxListPageState extends State<CheckboxListPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0), // Optional padding
+          padding: const EdgeInsets.only(
+            bottom: 16.0,
+            left: 4,
+          ), // Optional padding
           child: Column(
             children: [
+              const SizedBox(height: 16),
+              Text(
+                'Select at least one of these items to continue.',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 4),
               buildCheckboxSection(
                 'GPAX และ GPA',
                 gpax_items,

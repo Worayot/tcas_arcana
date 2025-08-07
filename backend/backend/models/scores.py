@@ -1,0 +1,41 @@
+from pydantic import BaseModel
+from typing import Optional
+
+class ScoreModel(BaseModel):
+    GPAX: Optional[float] = -1
+    GPA_THAI: Optional[float] = -1
+    GPA_MATH: Optional[float] = -1
+    GPA_SCIENCE: Optional[float] = -1
+    GPA_SOCIAL: Optional[float] = -1
+    GPA_PE: Optional[float] = -1
+    GPA_ART: Optional[float] = -1
+    GPA_KANNGAN: Optional[float] = -1
+    GPA_FOREIGNLANG: Optional[float] = -1
+    TGAT: Optional[float] = -1
+    TGAT1: Optional[float] = -1
+    TGAT2: Optional[float] = -1
+    TGAT3: Optional[float] = -1
+    TPAT1: Optional[float] = -1
+    TPAT2: Optional[float] = -1
+    TPAT3: Optional[float] = -1
+    TPAT4: Optional[float] = -1
+    TPAT5: Optional[float] = -1
+    TPAT21: Optional[float] = -1
+    TPAT22: Optional[float] = -1
+    TPAT23: Optional[float] = -1
+    A_Level_MATH1: Optional[float] = -1
+    A_Level_MATH2: Optional[float] = -1
+    A_Level_SCIENCE: Optional[float] = -1
+    A_Level_PHY: Optional[float] = -1
+    A_Level_CHEM: Optional[float] = -1
+    A_Level_BIO: Optional[float] = -1
+    A_Level_SOCIAL: Optional[float] = -1
+    A_Level_THAI: Optional[float] = -1
+    A_Level_ENG: Optional[float] = -1
+    A_Level_FRANCE: Optional[float] = -1
+    A_Level_GERMAN: Optional[float] = -1
+    A_Level_JAPANESE: Optional[float] = -1
+    A_Level_CHINESE: Optional[float] = -1
+    A_Level_BALI: Optional[float] = -1
+    A_Level_KOREAN: Optional[float] = -1
+    A_Level_SPAIN: Optional[float] = -1
